@@ -1,0 +1,35 @@
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+docs/
+specs/
+
+# IDE
+.idea/
+.vscode/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Build artifacts
+build/
+coverage.out
+coverage.html
+
+# Test files
+tests/
+*_test.go
+
+# Temporary files
+*.tmp
+tmp/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

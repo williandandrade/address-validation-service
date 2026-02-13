@@ -1,0 +1,75 @@
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - errcheck
+    - govet
+    - staticcheck
+    - unused
+    - ineffassign
+    - gofmt
+    - goimports
+    - misspell
+    - unconvert
+    - gosimple
+    - gocritic
+    - revive
+    - gosec
+    - bodyclose
+    - noctx
+    - errorlint
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  govet:
+    shadow: true
+  gofmt:
+    simplify: true
+  goimports:
+    local-prefixes: github.com/williandandrade/address-validation-service
+  misspell:
+    locale: US
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+  revive:
+    severity: warning
+    rules:
+      - name: exported
+        severity: warning
+      - name: blank-imports
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: increment-decrement
+      - name: var-naming
+      - name: package-comments
+      - name: range
+      - name: receiver-naming
+      - name: time-naming
+      - name: unexported-return
+      - name: indent-error-flow
+      - name: errorf
+  gosec:
+    excludes:
+      - G104 # Audit errors not checked (handled by errcheck)
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+        - gosec
+    - path: mock
+      linters:
+        - revive
+  max-issues-per-linter: 50
+  max-same-issues: 3
