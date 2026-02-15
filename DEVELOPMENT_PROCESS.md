@@ -61,3 +61,9 @@ Create the tasks.
 ```prompt
 /speckit.tasks
 ```
+
+Implement the tasks.
+
+```prompt
+/speckit.implement
+```

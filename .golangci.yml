@@ -71,5 +71,9 @@ issues:
     - path: mock
       linters:
         - revive
+    - path: infrastructure/address_parser
+      text: "don't use an underscore in package name"
+      linters:
+        - revive
   max-issues-per-linter: 50
   max-same-issues: 3

@@ -77,17 +77,17 @@ Establish project dependencies, configuration, and base structure for clean arch
 
 ### Implementation Tasks
 
-- [ ] T001 Install and verify gopostal dependency in go.mod
+- [X] T001 Install and verify gopostal dependency in go.mod
 
-- [ ] T002 [P] Create directory structure: internal/{domain/entity,domain/errors,usecase,infrastructure/address_parser,api/dto,api/handler}
+- [X] T002 [P] Create directory structure: internal/{domain/entity,domain/errors,usecase,infrastructure/address_parser,api/dto,api/handler}
 
-- [ ] T003 [P] Create internal/domain/errors/errors.go with ValidationError, ParsingError, AmbiguousAddressError types
+- [X] T003 [P] Create internal/domain/errors/errors.go with ValidationError, ParsingError, AmbiguousAddressError types
 
-- [ ] T004 [P] Create internal/usecase/repository.go with ValidateAddressRepository interface definition
+- [X] T004 [P] Create internal/usecase/repository.go with ValidateAddressRepository interface definition
 
-- [ ] T005 Create internal/domain/entity/address.go with Address, Confidence entities and Validate() method
+- [X] T005 Create internal/domain/entity/address.go with Address, Confidence entities and Validate() method
 
-- [ ] T006 Create internal/usecase/validate_address_mock.go with MockValidateAddressRepository for testing
+- [X] T006 Create internal/usecase/validate_address_mock.go with MockValidateAddressRepository for testing
 
 ---
 
@@ -108,17 +108,17 @@ Implement core business logic layer and address parsing infrastructure independe
 
 ### Implementation Tasks
 
-- [ ] T007 [P] Create internal/usecase/validate_address.go with ValidateAddressUsecase struct and ValidateAddress() method
+- [X] T007 [P] Create internal/usecase/validate_address.go with ValidateAddressUsecase struct and ValidateAddress() method
 
-- [ ] T008 [P] Implement ValidateAddressUsecase.assignConfidence() to set state/city/postal_code confidence levels
+- [X] T008 [P] Implement ValidateAddressUsecase.assignConfidence() to set state/city/postal_code confidence levels
 
-- [ ] T009 [P] Create internal/infrastructure/address_parser/gopostal_parser.go implementing ValidateAddressRepository interface
+- [X] T009 [P] Create internal/infrastructure/address_parser/gopostal_parser.go implementing ValidateAddressRepository interface
 
-- [ ] T010 [P] Implement GopostalParser.ParseAddress() to extract street, city, state, postal code components using gopostal
+- [X] T010 [P] Implement GopostalParser.ParseAddress() to extract street, city, state, postal code components using gopostal
 
-- [ ] T011 [P] Implement GopostalParser.detectAddressType() to classify address as standard_street/po_box/apo_fpo/rural_route
+- [X] T011 [P] Implement GopostalParser.detectAddressType() to classify address as standard_street/po_box/apo_fpo/rural_route
 
-- [ ] T012 Create internal/usecase/validate_address_test.go with table-driven unit tests using mock repository (test empty input, valid address, incomplete address)
+- [X] T012 Create internal/usecase/validate_address_test.go with table-driven unit tests using mock repository (test empty input, valid address, incomplete address)
 
 ---
 
@@ -147,23 +147,23 @@ Enable clients to send addresses in any format and receive normalized, standardi
 
 ### Implementation Tasks
 
-- [ ] T013 [US1] Update internal/api/dto/response.go with full ValidateResponse, AddressDTO, ConfidenceDTO, ErrorDTO schemas
+- [X] T013 [US1] Update internal/api/dto/response.go with full ValidateResponse, AddressDTO, ConfidenceDTO, ErrorDTO schemas
 
-- [ ] T014 [US1] Create internal/api/handler/validate_address.go HTTP handler for POST /api/v1/validate-address
+- [X] T014 [US1] Create internal/api/handler/validate_address.go HTTP handler for POST /api/v1/validate-address
 
-- [ ] T015 [US1] Implement handler request validation: check address field exists, is string, not empty
+- [X] T015 [US1] Implement handler request validation: check address field exists, is string, not empty
 
-- [ ] T016 [US1] Implement handler response mapping: convert entity.Address to dto.AddressDTO with confidence and corrections
+- [X] T016 [US1] Implement handler response mapping: convert entity.Address to dto.AddressDTO with confidence and corrections
 
-- [ ] T017 [US1] Register POST /api/v1/validate-address route in cmd/server/main.go with handler initialization
+- [X] T017 [US1] Register POST /api/v1/validate-address route in cmd/server/main.go with handler initialization
 
-- [ ] T018 [US1] Create internal/api/handler/validate_address_test.go with handler unit tests (mock usecase, test 200 response)
+- [X] T018 [US1] Create internal/api/handler/validate_address_test.go with handler unit tests (mock usecase, test 200 response)
 
-- [ ] T019 [US1] Create tests/integration/validate_address_integration_test.go with E2E tests (real gopostal, real HTTP requests)
+- [X] T019 [US1] Create tests/integration/validate_address_integration_test.go with E2E tests (real gopostal, real HTTP requests)
 
-- [ ] T020 [US1] Add test cases for various address formats: lowercase, extra spaces, mixed punctuation, abbreviated state names
+- [X] T020 [US1] Add test cases for various address formats: lowercase, extra spaces, mixed punctuation, abbreviated state names
 
-- [ ] T021 [US1] Run full test suite: `go test ./...` with minimum 80% coverage requirement
+- [X] T021 [US1] Run full test suite: `go test ./...` with minimum 80% coverage requirement
 
 ---
 
@@ -190,17 +190,17 @@ Ensure API response has well-defined, consistent structure across all valid addr
 
 ### Implementation Tasks
 
-- [ ] T022 [P] [US2] Implement Address.FormatAddress() to generate human-readable "Street, City, State ZIP" format
+- [X] T022 [P] [US2] Implement Address.FormatAddress() to generate human-readable "Street, City, State ZIP" format
 
-- [ ] T023 [P] [US2] Add corrections tracking to GopostalParser: populate Address.CorrectionsApplied with normalization details
+- [X] T023 [P] [US2] Add corrections tracking to GopostalParser: populate Address.CorrectionsApplied with normalization details
 
-- [ ] T024 [US2] Add test cases for response structure validation: verify all fields present, types correct, consistency across inputs
+- [X] T024 [US2] Add test cases for response structure validation: verify all fields present, types correct, consistency across inputs
 
-- [ ] T025 [US2] Create tests/contract/address_response_schema_test.go to validate response against OpenAPI schema
+- [X] T025 [US2] Create tests/contract/address_response_schema_test.go to validate response against OpenAPI schema
 
-- [ ] T026 [US2] Implement response consistency tests: submit multiple address formats, verify normalized results are identical
+- [X] T026 [US2] Implement response consistency tests: submit multiple address formats, verify normalized results are identical
 
-- [ ] T027 [US2] Document response examples in handler comments: success case with all fields populated
+- [X] T027 [US2] Document response examples in handler comments: success case with all fields populated
 
 ---
 
@@ -227,21 +227,21 @@ Return clear, actionable error messages when address cannot be normalized.
 
 ### Implementation Tasks
 
-- [ ] T028 [US3] Implement handler.handleUsecaseError() to map domain errors to HTTP status codes (400/422/500)
+- [X] T028 [US3] Implement handler.handleUsecaseError() to map domain errors to HTTP status codes (400/422/500)
 
-- [ ] T029 [US3] Add validation error handling: missing/empty address field → 400 with ValidationError response
+- [X] T029 [US3] Add validation error handling: missing/empty address field → 400 with ValidationError response
 
-- [ ] T030 [US3] Add parsing error handling: unparseable address → 422 with ParsingError details
+- [X] T030 [US3] Add parsing error handling: unparseable address → 422 with ParsingError details
 
-- [ ] T031 [US3] Implement error suggestion logic: suggest valid state codes, valid cities for given state
+- [X] T031 [US3] Implement error suggestion logic: suggest valid state codes, valid cities for given state
 
-- [ ] T032 [US3] Create internal/api/handler/error_mapping_test.go with tests for all error scenarios (empty, invalid, unparseable)
+- [X] T032 [US3] Create internal/api/handler/error_mapping_test.go with tests for all error scenarios (empty, invalid, unparseable)
 
-- [ ] T033 [US3] Add integration tests for error responses: verify field, reason, value, suggestion structure
+- [X] T033 [US3] Add integration tests for error responses: verify field, reason, value, suggestion structure
 
-- [ ] T034 [US3] Test error response consistency: ensure same error always produces same response format
+- [X] T034 [US3] Test error response consistency: ensure same error always produces same response format
 
-- [ ] T035 [US3] Document error response examples in openapi.yaml and handler code
+- [X] T035 [US3] Document error response examples in openapi.yaml and handler code
 
 ---
 
@@ -258,13 +258,13 @@ Complete implementation with logging, performance validation, and documentation.
 
 ### Implementation Tasks
 
-- [ ] T036 [P] Add structured logging via slog in handler request/response boundaries with correlation IDs
+- [X] T036 [P] Add structured logging via slog in handler request/response boundaries with correlation IDs
 
-- [ ] T037 [P] Create tests/performance/address_validation_benchmark_test.go with benchmark for gopostal parsing
+- [X] T037 [P] Create tests/performance/address_validation_benchmark_test.go with benchmark for gopostal parsing
 
-- [ ] T038 [P] Run `golangci-lint run ./...` and fix all warnings (imports, formatting, unused code)
+- [X] T038 [P] Run `golangci-lint run ./...` and fix all warnings (imports, formatting, unused code)
 
-- [ ] T039 Add README.md section documenting /api/v1/validate-address endpoint with curl examples
+- [X] T039 Add README.md section documenting /api/v1/validate-address endpoint with curl examples
 
 ---
 
@@ -332,37 +332,37 @@ Day 8: T036, T037, T038, T039 (4 parallel)
 ## Success Metrics & Acceptance Criteria
 
 ### Build & Test Success
-- [ ] `go build ./...` succeeds with zero errors
-- [ ] `go test ./...` passes with ≥80% coverage
-- [ ] `golangci-lint run ./...` produces zero warnings
-- [ ] All integration tests pass with real gopostal
+- [X] `go build ./...` succeeds with zero errors
+- [X] `go test ./...` passes with ≥80% coverage
+- [X] `golangci-lint run ./...` produces zero warnings
+- [X] All integration tests pass with real gopostal
 
 ### Functional Requirements Met
-- [ ] SC-001: Valid addresses normalized with 100% accuracy
-- [ ] SC-002: Invalid addresses identified with specific feedback (100% of cases)
-- [ ] SC-003: Response time <500ms p95 percentile
-- [ ] SC-004: Response schema consistent across all inputs
-- [ ] SC-005: Formatting variations normalize to identical form
-- [ ] SC-006: Normalized addresses usable in downstream systems
+- [X] SC-001: Valid addresses normalized with 100% accuracy
+- [X] SC-002: Invalid addresses identified with specific feedback (100% of cases)
+- [X] SC-003: Response time <500ms p95 percentile
+- [X] SC-004: Response schema consistent across all inputs
+- [X] SC-005: Formatting variations normalize to identical form
+- [X] SC-006: Normalized addresses usable in downstream systems
 
 ### User Story 1 (P1) MVP Complete
-- [ ] POST /api/v1/validate-address accepts raw address string
-- [ ] Returns normalized address with all components
-- [ ] Handles various formatting (capitalization, spacing, punctuation)
-- [ ] Response structure matches openapi.yaml
-- [ ] E2E tests pass with real gopostal
+- [X] POST /api/v1/validate-address accepts raw address string
+- [X] Returns normalized address with all components
+- [X] Handles various formatting (capitalization, spacing, punctuation)
+- [X] Response structure matches openapi.yaml
+- [X] E2E tests pass with real gopostal
 
 ### User Story 2 (P2) Complete
-- [ ] All responses have consistent schema
-- [ ] Confidence metadata populated
-- [ ] CorrectionsApplied tracked
-- [ ] FormattedAddress generated
+- [X] All responses have consistent schema
+- [X] Confidence metadata populated
+- [X] CorrectionsApplied tracked
+- [X] FormattedAddress generated
 
 ### User Story 3 (P2) Complete
-- [ ] Invalid input returns 400 with clear errors
-- [ ] Unparseable address returns 422 with suggestions
-- [ ] Error responses include field, reason, value, suggestion
-- [ ] Integration tests cover all error paths
+- [X] Invalid input returns 400 with clear errors
+- [X] Unparseable address returns 422 with suggestions
+- [X] Error responses include field, reason, value, suggestion
+- [X] Integration tests cover all error paths
 
 ---
 
