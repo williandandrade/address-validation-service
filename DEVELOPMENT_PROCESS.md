@@ -40,3 +40,8 @@ Create the project constitution by using SpecKit.
 
 ## Step 5
 
+```prompt
+/speckit.specify The API client should be able to send an open-format address to the API and receive the normalized address. Only US address required.
+```
+
+Output: The specification document @specs/001-address-normalization/spec.md.
