@@ -55,3 +55,9 @@ Create the plan.
 ```
 
 Output: The plan document @specs/001-address-normalization/plan.md.
+
+Create the tasks.
+
+```prompt
+/speckit.tasks
+```
