@@ -1,0 +1,376 @@
+openapi: 3.0.0
+info:
+  title: Address Validation Service
+  description: REST API for normalizing and validating US addresses
+  version: 1.0.0
+  contact:
+    name: Address Validation Team
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+  - url: https://api.example.com
+    description: Production
+
+paths:
+  /api/v1/validate-address:
+    post:
+      summary: Validate and normalize a US address
+      description: |
+        Normalizes a free-form address string into structured address components.
+        Handles diverse formats (street addresses, PO boxes, military addresses, rural routes).
+        Returns confidence metadata indicating which components were parsed directly vs. inferred.
+      operationId: validateAddress
+      tags:
+        - Address Validation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidateRequest"
+            examples:
+              simple:
+                summary: Simple valid address
+                value:
+                  address: "123 Main St New York NY 10001"
+              varied_format:
+                summary: Address with varied formatting
+                value:
+                  address: "123 main st, new york, ny 10001"
+              no_zip:
+                summary: Address without ZIP code
+                value:
+                  address: "123 Main St New York NY"
+      responses:
+        "200":
+          description: Address successfully normalized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidateResponse"
+              examples:
+                success:
+                  summary: Successful normalization
+                  value:
+                    success: true
+                    address:
+                      street_address: "123 Main St"
+                      city: "New York"
+                      state: "NY"
+                      postal_code: "10001"
+                      address_type: "standard_street"
+                      formatted_address: "123 Main St, New York, NY 10001"
+                    confidence:
+                      state_confidence: "direct"
+                      city_confidence: "direct"
+                      postal_confidence: "direct"
+                    corrections_applied:
+                      - "Standardized capitalization: 'main' → 'Main'"
+                    message: "Address validated successfully"
+                ambiguous:
+                  summary: Ambiguous address with multiple valid interpretations
+                  value:
+                    success: true
+                    address:
+                      street_address: "123 Main St"
+                      city: "Springfield"
+                      state: "IL"
+                      postal_code: "62701"
+                      address_type: "standard_street"
+                      formatted_address: "123 Main St, Springfield, IL 62701"
+                    candidates:
+                      - street_address: "123 Main St"
+                        city: "Springfield"
+                        state: "MO"
+                        postal_code: "65807"
+                      - street_address: "123 Main St"
+                        city: "Springfield"
+                        state: "MA"
+                        postal_code: "01103"
+                    message: "Multiple valid interpretations found; returning most populous match"
+        "400":
+          description: Invalid request - malformed input or missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                missing_field:
+                  summary: Missing address field
+                  value:
+                    success: false
+                    errors:
+                      - field: "address"
+                        reason: "address field is required"
+                        suggestion: "Provide a valid US address"
+                    message: "Request validation failed"
+                empty_address:
+                  summary: Empty address string
+                  value:
+                    success: false
+                    errors:
+                      - field: "address"
+                        reason: "address field is required and cannot be empty"
+                        suggestion: "Provide a valid US address"
+                    message: "Request validation failed"
+        "422":
+          description: Unprocessable Entity - address cannot be normalized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unparseable:
+                  summary: Address cannot be parsed
+                  value:
+                    success: false
+                    errors:
+                      - field: "address"
+                        reason: "Could not extract required address components"
+                        suggestion: "Ensure address contains street address, city, and state"
+                    message: "Address could not be normalized"
+                invalid_state:
+                  summary: Invalid state code
+                  value:
+                    success: false
+                    errors:
+                      - field: "state"
+                        reason: "Unknown state code"
+                        value: "XX"
+                        suggestion: "Did you mean 'TX' or 'CT'?"
+                    message: "Address could not be normalized"
+                invalid_city:
+                  summary: City not found in state
+                  value:
+                    success: false
+                    errors:
+                      - field: "city"
+                        reason: "City not found in provided state"
+                        value: "Fakeville"
+                        suggestion: "Did you mean 'Springfield' in IL?"
+                    message: "Address could not be normalized"
+        "500":
+          description: Internal Server Error - unexpected server failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internal_error:
+                  summary: Server encountered unexpected error
+                  value:
+                    success: false
+                    message: "Internal server error"
+
+components:
+  schemas:
+    ValidateRequest:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          type: string
+          minLength: 3
+          maxLength: 500
+          description: Raw address string in any format
+          examples:
+            - "123 Main St New York NY 10001"
+            - "PO Box 456 Springfield IL 62701"
+            - "123 main st, new york, ny"
+
+    ValidateResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          description: Whether address validation succeeded
+        address:
+          $ref: "#/components/schemas/Address"
+          description: Normalized address (present if success=true)
+        candidates:
+          type: array
+          description: Alternative valid interpretations for ambiguous addresses
+          items:
+            $ref: "#/components/schemas/Address"
+          maxItems: 10
+        confidence:
+          $ref: "#/components/schemas/Confidence"
+          description: Confidence levels for each address component
+        corrections_applied:
+          type: array
+          description: List of normalizations applied to input
+          items:
+            type: string
+          examples:
+            - - "Standardized capitalization: 'ny' → 'NY'"
+              - "Removed extra spaces"
+        errors:
+          type: array
+          description: Error details (present if success=false)
+          items:
+            $ref: "#/components/schemas/Error"
+        message:
+          type: string
+          description: Human-readable status message
+
+    Address:
+      type: object
+      required:
+        - street_address
+        - city
+        - state
+        - postal_code
+        - address_type
+      properties:
+        street_address:
+          type: string
+          description: Street number and name, or alternative (PO Box, APO, rural route)
+          examples:
+            - "123 Main St"
+            - "PO Box 456"
+            - "APO AE 09012"
+        city:
+          type: string
+          description: City or town name (proper case)
+          examples:
+            - "New York"
+            - "Springfield"
+            - "Los Angeles"
+        state:
+          type: string
+          description: 2-letter USPS state code (uppercase)
+          pattern: "^[A-Z]{2}$"
+          examples:
+            - "NY"
+            - "CA"
+            - "IL"
+            - "DC"
+        postal_code:
+          type: string
+          description: ZIP code in 5-digit or ZIP+4 format
+          pattern: '^\d{5}(-\d{4})?$'
+          examples:
+            - "10001"
+            - "90210"
+            - "10001-1234"
+        address_type:
+          type: string
+          enum:
+            - standard_street
+            - po_box
+            - apo_fpo
+            - rural_route
+          description: Classification of address format
+        formatted_address:
+          type: string
+          description: Human-readable full address string
+          examples:
+            - "123 Main St, New York, NY 10001"
+
+    Confidence:
+      type: object
+      required:
+        - state_confidence
+        - city_confidence
+        - postal_confidence
+      properties:
+        state_confidence:
+          type: string
+          enum:
+            - direct
+            - inferred_from_zip
+            - inferred_from_city
+          description: |
+            Where the state component came from:
+            - direct: Parsed directly from input
+            - inferred_from_zip: Derived from ZIP code lookup
+            - inferred_from_city: Derived from city-to-state mapping
+        city_confidence:
+          type: string
+          enum:
+            - direct
+            - inferred_from_zip
+            - inferred_from_state
+          description: |
+            Where the city component came from:
+            - direct: Parsed directly from input
+            - inferred_from_zip: Derived from ZIP code lookup
+            - inferred_from_state: Derived from state (least reliable)
+        postal_confidence:
+          type: string
+          enum:
+            - direct
+            - inferred
+          description: |
+            Where the postal code came from:
+            - direct: Parsed directly from input
+            - inferred: Derived from city+state lookup
+
+    Error:
+      type: object
+      required:
+        - field
+        - reason
+      properties:
+        field:
+          type: string
+          description: Address field that failed validation
+          examples:
+            - "address"
+            - "state"
+            - "city"
+        reason:
+          type: string
+          description: Human-readable explanation of the failure
+          examples:
+            - "Empty or missing required field"
+            - "Unknown state code"
+            - "City not found in provided state"
+        value:
+          description: The problematic value from input (optional)
+          oneOf:
+            - type: string
+            - type: "null"
+          examples:
+            - "XX"
+            - "Fakeville"
+        suggestion:
+          type: string
+          description: How to fix the error (optional)
+          examples:
+            - "Did you mean 'NY'?"
+            - "Did you mean 'Springfield, IL'?"
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+          description: Always false for error responses
+        errors:
+          type: array
+          description: Array of field-level errors
+          items:
+            $ref: "#/components/schemas/Error"
+        message:
+          type: string
+          description: Overall error message
+
+  securitySchemes: {}
+
+security: []
+
+tags:
+  - name: Address Validation
+    description: Address parsing and normalization operations

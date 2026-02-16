@@ -4,13 +4,40 @@ import (
 	"time"
 )
 
-// ValidateResponse represents the input address in a response.
+// ValidateResponse represents the API response for address validation.
 type ValidateResponse struct {
-	Street  string `json:"street"`
-	Number  string `json:"number,omitempty"`
-	City    string `json:"city"`
-	State   string `json:"state"`
-	ZipCode string `json:"zip_code"`
+	Success            bool           `json:"success"`
+	Address            *AddressDTO    `json:"address,omitempty"`
+	Candidates         []*AddressDTO  `json:"candidates,omitempty"`
+	Confidence         *ConfidenceDTO `json:"confidence,omitempty"`
+	CorrectionsApplied []string       `json:"corrections_applied,omitempty"`
+	Errors             []ErrorDTO     `json:"errors,omitempty"`
+	Message            string         `json:"message"`
+}
+
+// AddressDTO represents a normalized address in the response.
+type AddressDTO struct {
+	StreetAddress    string `json:"street_address"`
+	City             string `json:"city"`
+	State            string `json:"state"`
+	PostalCode       string `json:"postal_code"`
+	AddressType      string `json:"address_type"`
+	FormattedAddress string `json:"formatted_address,omitempty"`
+}
+
+// ConfidenceDTO represents confidence levels for address components.
+type ConfidenceDTO struct {
+	StateConfidence  string `json:"state_confidence"`
+	CityConfidence   string `json:"city_confidence"`
+	PostalConfidence string `json:"postal_confidence"`
+}
+
+// ErrorDTO represents a field-level error in the response.
+type ErrorDTO struct {
+	Field      string `json:"field"`
+	Reason     string `json:"reason"`
+	Value      any    `json:"value,omitempty"`
+	Suggestion string `json:"suggestion,omitempty"`
 }
 
 // APIErrorResponse represents an API error response.
