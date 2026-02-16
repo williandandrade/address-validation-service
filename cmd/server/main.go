@@ -8,6 +8,10 @@ import (
 	"github.com/williandandrade/address-validation-service/internal/usecase"
 )
 
+const (
+	BaseURL = "/api/v1"
+)
+
 func main() {
 	app := gofr.New()
 
