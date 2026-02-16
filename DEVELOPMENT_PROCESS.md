@@ -40,3 +40,30 @@ Create the project constitution by using SpecKit.
 
 ## Step 5
 
+Create the specification.
+
+```prompt
+/speckit.specify The API client should be able to send an open-format address to the API and receive the normalized address. Only US address required.
+```
+
+Output: The specification document @specs/001-address-normalization/spec.md.
+
+Create the plan.
+
+```prompt
+/speckit.plan Plan the technical implementation that covers all the specifications created on 001-address-normalization. The endpoint to be used is "/api/v1/validate-address", following by ValidateRequest and ValidateResponse. To implement the parse and normalization process use the "gopostal" library as a dependency to ValidateAddressUsecase.
+```
+
+Output: The plan document @specs/001-address-normalization/plan.md.
+
+Create the tasks.
+
+```prompt
+/speckit.tasks
+```
+
+Implement the tasks.
+
+```prompt
+/speckit.implement
+```
