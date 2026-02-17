@@ -85,12 +85,6 @@ make docker-build
 ### Run the container
 
 ```bash
-docker run -p 8080:8080 address-validation-service:latest
-```
-
-Or with the env file:
-
-```bash
 make docker-run
 ```
 

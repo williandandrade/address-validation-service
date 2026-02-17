@@ -1,5 +1,7 @@
-# Build stage
-FROM golang:1.25-alpine AS builder
+ARG PARSER=regex
+
+# --- Gopostal builder (only used when PARSER=gopostal) ---
+FROM golang:1.25-alpine AS gopostal-builder
 
 WORKDIR /app
 
@@ -13,8 +15,13 @@ RUN git clone https://github.com/openvenues/libpostal /tmp/libpostal && \
     ./configure --datadir=/usr/local/share/libpostal && \
     make -j$(nproc) && \
     make install && \
-    ldconfig /usr/local/lib 2>/dev/null || true && \
+    ldconfig /usr/local/lib && \
     rm -rf /tmp/libpostal
+
+# Stage libpostal runtime files for the final image
+RUN mkdir -p /runtime/lib /runtime/share && \
+    cp /usr/local/lib/libpostal* /runtime/lib/ && \
+    cp -r /usr/local/share/libpostal /runtime/share/
 
 # Copy go mod files first for better caching
 COPY go.mod go.sum* ./
@@ -26,19 +33,42 @@ COPY . .
 # Build with gopostal tag (enables real gopostal parser via CGO)
 RUN CGO_ENABLED=1 GOOS=linux go build -tags gopostal -ldflags="-w -s" -o /address-validation-service ./cmd/server
 
-# Runtime stage
+# --- Regex builder (default, no libpostal) ---
+FROM golang:1.25-alpine AS regex-builder
+
+WORKDIR /app
+
+RUN apk add --no-cache ca-certificates
+
+# Create empty runtime dirs (no libpostal needed)
+RUN mkdir -p /runtime/lib /runtime/share
+
+# Copy go mod files first for better caching
+COPY go.mod go.sum* ./
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build without gopostal tag — pure Go, no CGO needed
+RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o /address-validation-service ./cmd/server
+
+# --- Select builder based on PARSER arg ---
+FROM ${PARSER}-builder AS builder
+
+# --- Runtime ---
 FROM alpine:3.19
 
 WORKDIR /app
 
-# Install runtime dependencies including libpostal shared libraries
+# Install runtime dependencies
 RUN apk add --no-cache ca-certificates tzdata libstdc++ libgcc
 
-# Copy libpostal libraries and data from builder
-COPY --from=builder /usr/local/lib/libpostal* /usr/local/lib/
-COPY --from=builder /usr/local/share/libpostal /usr/local/share/libpostal
+# Copy libpostal libraries and data (empty dirs for regex builds, populated for gopostal)
+COPY --from=builder /runtime/lib/ /usr/local/lib/
+COPY --from=builder /runtime/share/ /usr/local/share/
 
-# Update library cache
+# Update library cache (needed for gopostal, harmless for regex)
 RUN ldconfig /usr/local/lib 2>/dev/null || true
 
 # Create non-root user
