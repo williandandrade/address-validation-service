@@ -11,10 +11,9 @@ specs/
 .idea/
 .vscode/
 
-# Environment files
-.env
-.env.*
-!.env.example
+# Environment files (root level only — configs/ .env files are needed for Docker)
+/.env
+/.env.*
 
 # Build artifacts
 build/

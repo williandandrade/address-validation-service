@@ -178,4 +178,4 @@ Environment variables (see `configs/.env.example`):
 | `LOG_LEVEL` | `debug` | Log level |
 | `HTTP_PORT` | `8080` | Server port |
 | `SHUTDOWN_GRACE_PERIOD` | `30s` | Graceful shutdown timeout |
-| `REQUEST_TIMEOUT` | `10s` | Request timeout |
+| `REQUEST_TIMEOUT` | `10` | Request timeout |

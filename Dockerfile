@@ -29,6 +29,7 @@ RUN go mod download
 
 # Copy source code
 COPY . .
+RUN cp configs/.env.example configs/.env
 
 # Build with gopostal tag (enables real gopostal parser via CGO)
 RUN CGO_ENABLED=1 GOOS=linux go build -tags gopostal -ldflags="-w -s" -o /address-validation-service ./cmd/server
@@ -49,6 +50,7 @@ RUN go mod download
 
 # Copy source code
 COPY . .
+RUN cp configs/.env.example configs/.env
 
 # Build without gopostal tag — pure Go, no CGO needed
 RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o /address-validation-service ./cmd/server
@@ -76,6 +78,9 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Copy binary from builder
 COPY --from=builder /address-validation-service .
+
+# Copy configs directory
+COPY --from=builder /app/configs ./configs
 
 # Set ownership
 RUN chown -R appuser:appgroup /app
