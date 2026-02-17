@@ -1,4 +1,4 @@
-.PHONY: build run test lint docker-build clean check fmt
+.PHONY: build run test lint docker-build docker-build-gopostal docker-run clean check fmt
 
 # Build variables
 BINARY_NAME=address-validation-service
@@ -35,13 +35,17 @@ fmt:
 # Run all checks (lint + test)
 check: lint test
 
-# Build Docker image
+# Build Docker image (regex parser — lightweight, works everywhere)
 docker-build:
 	@docker build -t $(BINARY_NAME):latest .
 
+# Build Docker image with gopostal (needs 4GB+ Docker memory)
+docker-build-gopostal:
+	@docker build --build-arg PARSER=gopostal -t $(BINARY_NAME):latest .
+
 # Run Docker container
 docker-run:
-	@docker run -p 8080:8080 --env-file .env $(BINARY_NAME):latest
+	@docker run -p 8080:8080 $(BINARY_NAME):latest
 
 # Clean build artifacts
 clean:

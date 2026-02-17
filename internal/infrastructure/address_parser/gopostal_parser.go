@@ -6,7 +6,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/openvenues/gopostal/parser"
+	parser "github.com/openvenues/gopostal/parser"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
